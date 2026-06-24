@@ -253,7 +253,7 @@ export class BoardRenderer {
     this.app.stage.addChild(gfx)
   }
 
-  private getOrCreateToken(player: Player, index: number): PIXI.Container {
+  private getOrCreateToken(player: Player, _index: number): PIXI.Container {
     if (this.tokenSprites.has(player.id)) {
       return this.tokenSprites.get(player.id)!
     }

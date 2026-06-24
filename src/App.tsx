@@ -6,7 +6,7 @@ import Dice from './components/Dice'
 import RollHistory from './components/RollHistory'
 import MusicToggle from './components/MusicToggle'
 import NameEntry from './components/NameEntry'
-import type { GameMode } from './game/board'
+//import type { GameMode } from './game/board'
 
 export default function App() {
   const containerRef = useRef<HTMLDivElement>(null)
