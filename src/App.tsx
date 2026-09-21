@@ -182,7 +182,7 @@ export default function App() {
         <div
           key={p.id}
           className={`relative overflow-hidden rounded-xl transition-all duration-300 ${
-            isMobile ? 'flex-1 px-2 py-1.5' : 'px-4 py-3'
+            isMobile ? 'flex-1 px-2 py-1.5 mt-8' : 'px-4 py-3'
           } ${
             gameState.currentPlayerIndex === p.id
               ? 'bg-gradient-to-r from-purple-600/90 to-pink-600/90 backdrop-blur-md border-2 border-purple-400 shadow-2xl scale-[1.02]'
@@ -281,41 +281,7 @@ export default function App() {
     </button>
   )
 
-  const modeSelection = !gameState && (
-    <div className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20 shadow-xl">
-      <div className="flex items-center justify-between mb-3">
-        <h1 className="text-2xl font-bold bg-gradient-to-r from-yellow-400 to-pink-400 bg-clip-text text-transparent">
-          Snakes & Ladders
-        </h1>
-        <MusicToggle onToggle={audio.toggleMusic} />
-      </div>
-      <div className="space-y-3">
-        {pendingMode ? (
-          <NameEntry
-            mode={pendingMode}
-            onStart={(names) => { startGame(pendingMode, names); setPendingMode(null) }}
-            onBack={() => setPendingMode(null)}
-          />
-        ) : (
-          <>
-            <p className="text-white/70 text-sm text-center">Choose the number of players</p>
-            <button
-              onClick={() => setPendingMode('1p')}
-              className="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg"
-            >
-              Play against Nebula
-            </button>
-            <button
-              onClick={() => setPendingMode('2p')}
-              className="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg"
-            >
-              2 Players
-            </button>
-          </>
-        )}
-      </div>
-    </div>
-  )
+
 
   const winnerScreen = displayWinner && (
     <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-8 shadow-2xl">
@@ -346,7 +312,15 @@ export default function App() {
   const boardElement = (
     <div
       className="relative flex-shrink-0"
-      style={isMobile ? { width: boardDisplaySize, height: boardDisplaySize } : undefined}
+      style={
+        isMobile
+          ? {
+              width: boardDisplaySize,
+              height: boardDisplaySize,
+              touchAction: 'pan-y',
+            }
+          : undefined
+      }
     >
       <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur-lg opacity-50 animate-pulse" />
       <div
@@ -366,7 +340,7 @@ export default function App() {
   // ── DESKTOP layout ──────────────────────────────────────────────────
   if (!isMobile) {
     return (
-      <div className="h-dvh overflow-y-auto touch-pan-y bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col items-center p-0">
+      <div className="h-dvh overflow-y-auto bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col items-center py-8">
         <div className="fixed inset-0 bg-black/20 pointer-events-none" />
         <div className="pointer-events-none fixed inset-0 z-50 transition-opacity duration-300"
           style={{ backgroundColor: 'rgba(239,68,68,0.3)', backdropFilter: flashRed ? 'blur(2px)' : 'none', opacity: flashRed ? 1 : 0 }}
@@ -435,7 +409,7 @@ export default function App() {
 
   // ── MOBILE layout ───────────────────────────────────────────────────
   return (
-    <div className="h-dvh overflow-y-auto bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col items-center p-0">
+    <div className="min-h-dvh w-full overflow-x-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col items-center p-0 pb-6">
       <div className="fixed inset-0 bg-black/20 pointer-events-none" />
       <div className="pointer-events-none fixed inset-0 z-50 transition-opacity duration-300"
         style={{ backgroundColor: 'rgba(239,68,68,0.3)', backdropFilter: flashRed ? 'blur(2px)' : 'none', opacity: flashRed ? 1 : 0 }}
@@ -445,7 +419,7 @@ export default function App() {
 
       {/* Top controls */}
       <div
-        className="w-full flex items-center justify-between px-3 py-2"
+        className="w-full flex items-center justify-between px-3 py-2 mb-4"
         style={{ maxWidth: boardDisplaySize }}
       >
         {gameState ? (
@@ -469,16 +443,10 @@ export default function App() {
         {/* Controls below board */}
         <div className="w-full px-3 py-2 flex flex-col gap-2" style={{ maxWidth: boardDisplaySize }}>
 
-          {/* Header row */}
-          <div className="bg-white/10 backdrop-blur-md rounded-xl px-3 py-2 border border-white/20 flex items-center justify-between">
-            <h1 className="text-sm font-bold text-center bg-gradient-to-r from-yellow-400 to-pink-400 bg-clip-text text-transparent">
-              Snakes & Ladders
-            </h1>
-          </div>
 
           {/* Mode selection on mobile */}
           {!gameState && (
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 space-y-2">
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 mt-4 border border-white/20 space-y-2">
               {pendingMode ? (
                 <NameEntry
                   mode={pendingMode}
