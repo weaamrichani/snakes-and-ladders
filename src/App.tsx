@@ -39,13 +39,15 @@ function useBoardScale() {
 export default function App() {
   const containerRef   = useRef<HTMLDivElement>(null)
   const rendererRef    = useRef<BoardRenderer | null>(null)
-  const initializedRef = useRef(false)
+  
   const [animating, setAnimating]         = useState(false)
   const [flashRed, setFlashRed]           = useState(false)
   const [pendingMode, setPendingMode]     = useState<'1p' | '2p' | null>(null)
   const [displayEvent, setDisplayEvent]   = useState<'snake' | 'ladder' | 'none' | 'overshoot' | null>(null)
   const [displayWinner, setDisplayWinner] = useState<string | null>(null)
-  const [isMobile, setIsMobile]           = useState(false)
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== 'undefined' && window.innerWidth < 768
+  )
 
   const boardScale = useBoardScale()
   const boardDisplaySize = BOARD_RENDER_SIZE * boardScale
@@ -69,19 +71,23 @@ export default function App() {
     setTimeout(() => setFlashRed(false), 600)
   }
 
-  // Boot PixiJS once
+ // Boot/reboot PixiJS when layout changes
   useEffect(() => {
-    if (!containerRef.current || initializedRef.current) return
-    initializedRef.current = true
+    if (!containerRef.current) return
+
     const renderer = new BoardRenderer()
+
     rendererRef.current = renderer
     renderer.init(containerRef.current)
+
     return () => {
-      rendererRef.current?.destroy()
-      rendererRef.current = null
-      initializedRef.current = false
+      renderer.destroy()
+
+      if (rendererRef.current === renderer) {
+        rendererRef.current = null
+      }
     }
-  }, [])
+  }, [isMobile])
 
   // Animate on move
   useEffect(() => {
