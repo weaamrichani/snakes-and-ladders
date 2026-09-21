@@ -1,15 +1,14 @@
-
-
 import * as PIXI from 'pixi.js'
 import { squareToGrid, DEFAULT_CONFIG } from './board'
 import type { BoardConfig, Player } from './board'
 
-const GRID = 10
-const CELL = 66
+const GRID    = 10
+const CELL    = 66
 const BOARD_PX = GRID * CELL
-const TEXT_COLOR   = 0x2c2c2a
-const CELL_LIGHT   = 0xf5f3ee
-const CELL_DARK    = 0xe2dfd6
+
+const TEXT_COLOR  = 0x2c2c2a
+const CELL_LIGHT  = 0xf5f3ee
+const CELL_DARK   = 0xe2dfd6
 
 function squareToPixel(square: number): { x: number; y: number } {
   const { col, row } = squareToGrid(square)
@@ -61,45 +60,28 @@ function drawLadder(gfx: PIXI.Graphics, x1: number, y1: number, x2: number, y2: 
   const dx = x2 - x1
   const dy = y2 - y1
   const len = Math.sqrt(dx * dx + dy * dy)
-  const ux = dx / len
   const uy = dy / len
   const px = -uy * 7
-  const py = ux * 7
+  const py = (dx / len) * 7
 
-  const RAIL_COLOR = 0x8B5E3C
-  const RUNG_COLOR = 0xC49A6C
+  const RAIL_COLOR   = 0x8B5E3C
+  const RUNG_COLOR   = 0xC49A6C
   const SHADOW_COLOR = 0x5C3D1E
 
-  gfx.moveTo(x1 + px + 1, y1 + py + 1)
-    .lineTo(x2 + px + 1, y2 + py + 1)
-    .stroke({ color: SHADOW_COLOR, width: 4, alpha: 0.3 })
-  gfx.moveTo(x1 - px + 1, y1 - py + 1)
-    .lineTo(x2 - px + 1, y2 - py + 1)
-    .stroke({ color: SHADOW_COLOR, width: 4, alpha: 0.3 })
-
-  gfx.moveTo(x1 + px, y1 + py)
-    .lineTo(x2 + px, y2 + py)
-    .stroke({ color: RAIL_COLOR, width: 4 })
-  gfx.moveTo(x1 - px, y1 - py)
-    .lineTo(x2 - px, y2 - py)
-    .stroke({ color: RAIL_COLOR, width: 4 })
+  gfx.moveTo(x1 + px + 1, y1 + py + 1).lineTo(x2 + px + 1, y2 + py + 1).stroke({ color: SHADOW_COLOR, width: 4, alpha: 0.3 })
+  gfx.moveTo(x1 - px + 1, y1 - py + 1).lineTo(x2 - px + 1, y2 - py + 1).stroke({ color: SHADOW_COLOR, width: 4, alpha: 0.3 })
+  gfx.moveTo(x1 + px, y1 + py).lineTo(x2 + px, y2 + py).stroke({ color: RAIL_COLOR, width: 4 })
+  gfx.moveTo(x1 - px, y1 - py).lineTo(x2 - px, y2 - py).stroke({ color: RAIL_COLOR, width: 4 })
 
   const rungCount = Math.max(2, Math.floor(len / 22))
   for (let i = 1; i < rungCount; i++) {
     const t = i / rungCount
     const rx = x1 + dx * t
     const ry = y1 + dy * t
-    gfx.moveTo(rx + px, ry + py)
-      .lineTo(rx - px, ry - py)
-      .stroke({ color: RUNG_COLOR, width: 3 })
+    gfx.moveTo(rx + px, ry + py).lineTo(rx - px, ry - py).stroke({ color: RUNG_COLOR, width: 3 })
   }
-
-  gfx.moveTo(x1 + px, y1 + py)
-    .lineTo(x1 - px, y1 - py)
-    .stroke({ color: RUNG_COLOR, width: 3 })
-  gfx.moveTo(x2 + px, y2 + py)
-    .lineTo(x2 - px, y2 - py)
-    .stroke({ color: RUNG_COLOR, width: 3 })
+  gfx.moveTo(x1 + px, y1 + py).lineTo(x1 - px, y1 - py).stroke({ color: RUNG_COLOR, width: 3 })
+  gfx.moveTo(x2 + px, y2 + py).lineTo(x2 - px, y2 - py).stroke({ color: RUNG_COLOR, width: 3 })
 }
 
 function drawSnake(
@@ -135,9 +117,7 @@ function drawSnake(
     const t = i / steps
     const bx = Math.pow(1-t,3)*headX + 3*Math.pow(1-t,2)*t*mid1X + 3*(1-t)*t*t*mid2X + t*t*t*tailX
     const by = Math.pow(1-t,3)*headY + 3*Math.pow(1-t,2)*t*mid1Y + 3*(1-t)*t*t*mid2Y + t*t*t*tailY
-    if (i % 2 === 0) {
-      gfx.circle(bx, by, 3).fill({ color: colorBody, alpha: 0.6 })
-    }
+    if (i % 2 === 0) gfx.circle(bx, by, 3).fill({ color: colorBody, alpha: 0.6 })
   }
 
   const headAngle = Math.atan2(headY - mid1Y, headX - mid1X)
@@ -157,23 +137,13 @@ function drawSnake(
   const tx = headX + Math.cos(tongueAngle) * 10
   const ty = headY + Math.sin(tongueAngle) * 10
   const fork = 0.35
-  gfx.moveTo(headX + Math.cos(tongueAngle) * 2, headY + Math.sin(tongueAngle) * 2)
-    .lineTo(tx, ty)
-    .stroke({ color: 0xe63946, width: 1.5 })
-  gfx.moveTo(tx, ty)
-    .lineTo(tx + Math.cos(tongueAngle + fork) * tongueLen * 0.5, ty + Math.sin(tongueAngle + fork) * tongueLen * 0.5)
-    .stroke({ color: 0xe63946, width: 1.5 })
-  gfx.moveTo(tx, ty)
-    .lineTo(tx + Math.cos(tongueAngle - fork) * tongueLen * 0.5, ty + Math.sin(tongueAngle - fork) * tongueLen * 0.5)
-    .stroke({ color: 0xe63946, width: 1.5 })
+  gfx.moveTo(headX + Math.cos(tongueAngle) * 2, headY + Math.sin(tongueAngle) * 2).lineTo(tx, ty).stroke({ color: 0xe63946, width: 1.5 })
+  gfx.moveTo(tx, ty).lineTo(tx + Math.cos(tongueAngle + fork) * tongueLen * 0.5, ty + Math.sin(tongueAngle + fork) * tongueLen * 0.5).stroke({ color: 0xe63946, width: 1.5 })
+  gfx.moveTo(tx, ty).lineTo(tx + Math.cos(tongueAngle - fork) * tongueLen * 0.5, ty + Math.sin(tongueAngle - fork) * tongueLen * 0.5).stroke({ color: 0xe63946, width: 1.5 })
 
   const tailAngle = Math.atan2(tailY - mid2Y, tailX - mid2X)
-  gfx.moveTo(tailX - Math.cos(tailAngle) * 6, tailY - Math.sin(tailAngle) * 6)
-    .lineTo(tailX + Math.cos(tailAngle) * 8, tailY + Math.sin(tailAngle) * 8)
-    .stroke({ color: colorBody, width: 4, cap: 'round' })
-  gfx.moveTo(tailX, tailY)
-    .lineTo(tailX + Math.cos(tailAngle) * 8, tailY + Math.sin(tailAngle) * 8)
-    .stroke({ color: colorBelly, width: 2, cap: 'round' })
+  gfx.moveTo(tailX - Math.cos(tailAngle) * 6, tailY - Math.sin(tailAngle) * 6).lineTo(tailX + Math.cos(tailAngle) * 8, tailY + Math.sin(tailAngle) * 8).stroke({ color: colorBody, width: 4, cap: 'round' })
+  gfx.moveTo(tailX, tailY).lineTo(tailX + Math.cos(tailAngle) * 8, tailY + Math.sin(tailAngle) * 8).stroke({ color: colorBelly, width: 2, cap: 'round' })
 }
 
 const SNAKE_COLORS = [
@@ -216,10 +186,10 @@ export class BoardRenderer {
       const { col, row } = squareToGrid(square)
       const x = col * CELL
       const y = (9 - row) * CELL
-      const cell = new PIXI.Graphics()
+      const g = new PIXI.Graphics()
       const fill = (col + row) % 2 === 0 ? CELL_LIGHT : CELL_DARK
-      cell.rect(x, y, CELL, CELL).fill(fill).stroke({ color: 0xcccccc, width: 0.5 })
-      this.app.stage.addChild(cell)
+      g.rect(x, y, CELL, CELL).fill(fill).stroke({ color: 0xcccccc, width: 0.5 })
+      this.app.stage.addChild(g)
       const label = new PIXI.Text({
         text: String(square),
         style: { fontSize: 11, fill: TEXT_COLOR, fontFamily: 'sans-serif' }
@@ -254,9 +224,7 @@ export class BoardRenderer {
   }
 
   private getOrCreateToken(player: Player, _index: number): PIXI.Container {
-    if (this.tokenSprites.has(player.id)) {
-      return this.tokenSprites.get(player.id)!
-    }
+    if (this.tokenSprites.has(player.id)) return this.tokenSprites.get(player.id)!
     const token = new PIXI.Graphics()
     token.circle(0, 0, 14).fill(player.color).stroke({ color: 0xffffff, width: 2 })
     const label = new PIXI.Text({
@@ -283,64 +251,53 @@ export class BoardRenderer {
     if (!sprite) return
     await shakeToken(sprite)
   }
-async animatePlayerMove(
-  player: Player,
-  fromSquare: number,
-  toSquare: number,
-  finalSquare: number,
-  playerIndex: number,
-  onLanded?: () => void,
-  onEventDone?: () => void,
-  onStep?: () => void
-): Promise<void> {
-  this.animating = true
 
-  try {
-    const sprite = this.getOrCreateToken(player, playerIndex)
-    const offset = this.tokenOffset(playerIndex)
+  async animatePlayerMove(
+    player: Player,
+    fromSquare: number,
+    toSquare: number,
+    finalSquare: number,
+    playerIndex: number,
+    onLanded?: () => void,
+    onEventDone?: () => void,
+    onStep?: () => void
+  ): Promise<void> {
+    this.animating = true
+    try {
+      const sprite = this.getOrCreateToken(player, playerIndex)
+      const offset = this.tokenOffset(playerIndex)
 
-    if (fromSquare === 0) {
-      const startPos = squareToPixel(1)
-      sprite.x = startPos.x + offset.dx - CELL
-      sprite.y = startPos.y + offset.dy
+      if (fromSquare === 0) {
+        const startPos = squareToPixel(1)
+        sprite.x = startPos.x + offset.dx - CELL
+        sprite.y = startPos.y + offset.dy
+      }
+
+      await new Promise(r => setTimeout(r, 600))
+
+      for (let sq = fromSquare + 1; sq <= toSquare; sq++) {
+        const pos = squareToPixel(sq)
+        onStep?.()
+        await animateTo(sprite, pos.x + offset.dx, pos.y + offset.dy, 220)
+      }
+
+      onLanded?.()
+
+      if (finalSquare !== toSquare) {
+        await new Promise(r => setTimeout(r, 300))
+        await this.scaleToken(sprite, 1.3, 120)
+        onEventDone?.()
+        const isSnake = finalSquare < toSquare
+        const finalPos = squareToPixel(finalSquare)
+        await animateTo(sprite, finalPos.x + offset.dx, finalPos.y + offset.dy, isSnake ? 600 : 500)
+        await this.scaleToken(sprite, 1.0, 100)
+      } else {
+        onEventDone?.()
+      }
+    } finally {
+      this.animating = false
     }
-
-    await new Promise(r => setTimeout(r, 600))
-
-    
-    // Plays at START of each step 
-    for (let sq = fromSquare + 1; sq <= toSquare; sq++) {
-      const pos = squareToPixel(sq)
-      onStep?.()
-      await animateTo(sprite, pos.x + offset.dx, pos.y + offset.dy, 220)
-    }
-      
-    /*
-    // Plays at END of each step (landing feel)
-    for (let sq = fromSquare + 1; sq <= toSquare; sq++) {
-      const pos = squareToPixel(sq)
-      await animateTo(sprite, pos.x + offset.dx, pos.y + offset.dy, 220)
-      onStep?.()   // ← fires after landing
-    }
-      */
-
-    onLanded?.()
-
-    if (finalSquare !== toSquare) {
-      await new Promise(r => setTimeout(r, 300))
-      await this.scaleToken(sprite, 1.3, 120)
-      onEventDone?.()
-      const isSnake = finalSquare < toSquare
-      const finalPos = squareToPixel(finalSquare)
-      await animateTo(sprite, finalPos.x + offset.dx, finalPos.y + offset.dy, isSnake ? 600 : 500)
-      await this.scaleToken(sprite, 1.0, 100)
-    } else {
-      onEventDone?.()
-    }
-  } finally {
-    this.animating = false
   }
-}
 
   private scaleToken(sprite: PIXI.Container, targetScale: number, duration: number): Promise<void> {
     return new Promise((resolve) => {
@@ -373,8 +330,6 @@ async animatePlayerMove(
   }
 
   destroy() {
-    if (this.app && this.app.renderer) {
-      this.app.destroy(true)
-    }
+    if (this.app && this.app.renderer) this.app.destroy(true)
   }
 }
